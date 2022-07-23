@@ -48,8 +48,9 @@ Add the dependency `video_trimmer` to your **pubspec.yaml** file:
 
 ```yaml
 dependencies:
-  git:
-    url: https://github.com/bluejoyq/video_trimmer.git
+  video_trimmer:
+    git:
+      url: https://github.com/bluejoyq/video_trimmer.git
 ```
 
 ### Android configuration
