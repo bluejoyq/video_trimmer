@@ -190,7 +190,7 @@ class TrimEditor extends StatefulWidget {
     this.durationTextStyle = const TextStyle(color: Colors.white),
     required this.onChangeStart,
     required this.onChangeEnd,
-    this.onChangePlaybackState,
+    required this.onChangePlaybackState,
   }) : super(key: key);
 
   @override
