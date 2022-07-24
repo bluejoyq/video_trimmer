@@ -285,11 +285,15 @@ class _TrimEditorState extends State<TrimEditor> with TickerProviderStateMixin {
             ),
           );
           _animationController!.addListener(() {
-            if (_animationController!.isCompleted) {
-              _animationController!.reset();
-            }
             if (_animationController!.isDismissed) {
               _animationController!.forward();
+            }
+            if (_animationController!.isCompleted) {
+              widget.onChangePlaybackState!(true);
+              videoPlayerController.seekTo(
+                  Duration(milliseconds: widget.trimmer.videoStartPos.toInt()));
+              widget.onChangePlaybackState!(false);
+              _animationController!.reset();
             }
           });
 
@@ -314,15 +318,11 @@ class _TrimEditorState extends State<TrimEditor> with TickerProviderStateMixin {
   Future<void> _initializeVideoController() async {
     if (_videoFile != null) {
       videoPlayerController.addListener(() {
-        widget.onChangePlaybackState!(true);
         setState(() {
           _currentPosition =
               videoPlayerController.value.position.inMilliseconds;
           if (_currentPosition > widget.trimmer.videoEndPos.toInt()) {
-            videoPlayerController.seekTo(
-                Duration(milliseconds: widget.trimmer.videoStartPos.toInt()));
             _animationController!.reset();
-            widget.onChangePlaybackState!(false);
           } else {
             if (!_animationController!.isAnimating) {
               widget.onChangePlaybackState!(true);
@@ -330,7 +330,6 @@ class _TrimEditorState extends State<TrimEditor> with TickerProviderStateMixin {
           }
         });
       });
-
       videoPlayerController.setVolume(1.0);
       _videoDuration = videoPlayerController.value.duration.inMilliseconds;
 

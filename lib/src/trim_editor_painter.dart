@@ -117,6 +117,11 @@ class TrimEditorPainter extends CustomPainter {
 
     final rect = Rect.fromPoints(startPos, endPos);
 
+    canvas.drawRect(rect, borderPaint);
+    canvas.drawCircle(
+        startPos + Offset(0, endPos.dy / 2), circleSize, circlePaint);
+    canvas.drawCircle(
+        endPos + Offset(0, -endPos.dy / 2), circleSize, circlePaint);
     if (showScrubber) {
       if (scrubberAnimationDx.toInt() > startPos.dx.toInt()) {
         canvas.drawLine(
@@ -126,12 +131,6 @@ class TrimEditorPainter extends CustomPainter {
         );
       }
     }
-
-    canvas.drawRect(rect, borderPaint);
-    canvas.drawCircle(
-        startPos + Offset(0, endPos.dy / 2), circleSize, circlePaint);
-    canvas.drawCircle(
-        endPos + Offset(0, -endPos.dy / 2), circleSize, circlePaint);
   }
 
   @override
