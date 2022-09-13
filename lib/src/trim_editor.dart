@@ -241,70 +241,16 @@ class _TrimEditorState extends State<TrimEditor> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-
-    widget.trimmer.eventStream.listen((event) {
-      if (event == TrimmerEvent.initialized) {
-        //The video has been initialized, now we can load stuff
-
-        _initializeVideoController();
-        videoPlayerController.seekTo(const Duration(milliseconds: 0));
-        setState(() {
-          Duration totalDuration = videoPlayerController.value.duration;
-
-          if (widget.maxVideoLength > const Duration(milliseconds: 0) &&
-              widget.maxVideoLength < totalDuration) {
-            if (widget.maxVideoLength < totalDuration) {
-              fraction = widget.maxVideoLength.inMilliseconds /
-                  totalDuration.inMilliseconds;
-
-              maxLengthPixels = _thumbnailViewerW * fraction!;
-            }
-          } else {
-            maxLengthPixels = _thumbnailViewerW;
-          }
-
-          widget.trimmer.videoEndPos = fraction != null
-              ? _videoDuration.toDouble() * fraction!
-              : _videoDuration.toDouble();
-
-          widget.onChangeEnd!(widget.trimmer.videoEndPos);
-
-          _endPos = Offset(
-            maxLengthPixels != null ? maxLengthPixels! : _thumbnailViewerW,
-            _thumbnailViewerH,
-          );
-
-          // Defining the tween points
-          _linearTween = Tween(begin: _startPos.dx, end: _endPos.dx);
-          _animationController = AnimationController(
-            vsync: this,
-            duration: Duration(
-              milliseconds:
-                  (widget.trimmer.videoEndPos - widget.trimmer.videoStartPos)
-                      .toInt(),
-            ),
-          );
-          _animationController!.addListener(() {
-            if (_animationController!.isDismissed) {
-              _animationController!.forward();
-            }
-            if (_animationController!.isCompleted) {
-              widget.onChangePlaybackState!(true);
-              videoPlayerController.seekTo(
-                  Duration(milliseconds: widget.trimmer.videoStartPos.toInt()));
-              widget.onChangePlaybackState!(false);
-              _animationController!.reset();
-            }
-          });
-
-          _scrubberAnimation = _linearTween.animate(_animationController!)
-            ..addListener(() {
-              setState(() {});
-            });
-          _animationController!.forward();
-        });
-      }
-    });
+    if (widget.trimmer.isInitialized) {
+      _init();
+    } else {
+      widget.trimmer.eventStream.listen((event) {
+        if (event == TrimmerEvent.initialized) {
+          //The video has been initialized, now we can load stuff
+          _init();
+        }
+      });
+    }
 
     _circleSize = widget.circleSize;
 
@@ -313,6 +259,66 @@ class _TrimEditorState extends State<TrimEditor> with TickerProviderStateMixin {
     _numberOfThumbnails = widget.viewerWidth ~/ _thumbnailViewerH;
 
     _thumbnailViewerW = _numberOfThumbnails * _thumbnailViewerH;
+  }
+
+  void _init() {
+    _initializeVideoController();
+    videoPlayerController.seekTo(const Duration(milliseconds: 0));
+    setState(() {
+      Duration totalDuration = videoPlayerController.value.duration;
+
+      if (widget.maxVideoLength > const Duration(milliseconds: 0) &&
+          widget.maxVideoLength < totalDuration) {
+        if (widget.maxVideoLength < totalDuration) {
+          fraction = widget.maxVideoLength.inMilliseconds /
+              totalDuration.inMilliseconds;
+
+          maxLengthPixels = _thumbnailViewerW * fraction!;
+        }
+      } else {
+        maxLengthPixels = _thumbnailViewerW;
+      }
+
+      widget.trimmer.videoEndPos = fraction != null
+          ? _videoDuration.toDouble() * fraction!
+          : _videoDuration.toDouble();
+
+      widget.onChangeEnd!(widget.trimmer.videoEndPos);
+
+      _endPos = Offset(
+        maxLengthPixels != null ? maxLengthPixels! : _thumbnailViewerW,
+        _thumbnailViewerH,
+      );
+
+      // Defining the tween points
+      _linearTween = Tween(begin: _startPos.dx, end: _endPos.dx);
+      _animationController = AnimationController(
+        vsync: this,
+        duration: Duration(
+          milliseconds:
+              (widget.trimmer.videoEndPos - widget.trimmer.videoStartPos)
+                  .toInt(),
+        ),
+      );
+      _animationController!.addListener(() {
+        if (_animationController!.isDismissed) {
+          _animationController!.forward();
+        }
+        if (_animationController!.isCompleted) {
+          widget.onChangePlaybackState!(true);
+          videoPlayerController.seekTo(
+              Duration(milliseconds: widget.trimmer.videoStartPos.toInt()));
+          widget.onChangePlaybackState!(false);
+          _animationController!.reset();
+        }
+      });
+
+      _scrubberAnimation = _linearTween.animate(_animationController!)
+        ..addListener(() {
+          setState(() {});
+        });
+      _animationController!.forward();
+    });
   }
 
   Future<void> _initializeVideoController() async {

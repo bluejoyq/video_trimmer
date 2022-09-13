@@ -21,6 +21,7 @@ class Trimmer {
   File? currentVideoFile;
   double videoStartPos = 0.0;
   double videoEndPos = 0.0;
+  bool isInitialized = false;
 
   /// Listen to this stream to catch the events
   Stream<TrimmerEvent> get eventStream => _controller.stream;
@@ -36,6 +37,7 @@ class Trimmer {
         _videoPlayerController!.setLooping(true);
         _videoPlayerController!.play();
         _controller.add(TrimmerEvent.initialized);
+        isInitialized = true;
       });
     }
   }
