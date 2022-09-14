@@ -76,6 +76,7 @@ class Trimmer {
   /// Clean up
   void dispose() {
     _controller.close();
+    _videoPlayerController?.removeListener(() {});
     _videoPlayerController?.dispose();
   }
 }

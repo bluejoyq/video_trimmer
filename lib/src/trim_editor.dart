@@ -242,7 +242,7 @@ class _TrimEditorState extends State<TrimEditor> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     if (widget.trimmer.isInitialized) {
-      _init();
+      WidgetsBinding.instance.addPostFrameCallback((_) => _init());
     } else {
       widget.trimmer.eventStream.listen((event) {
         if (event == TrimmerEvent.initialized) {
@@ -459,6 +459,8 @@ class _TrimEditorState extends State<TrimEditor> with TickerProviderStateMixin {
   void dispose() {
     _animationController?.removeListener(() {});
     _animationController?.dispose();
+    videoPlayerController.removeListener(() {});
+    _scrubberAnimation?.removeListener(() {});
     super.dispose();
   }
 
