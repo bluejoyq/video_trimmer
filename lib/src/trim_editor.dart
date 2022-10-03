@@ -323,19 +323,6 @@ class _TrimEditorState extends State<TrimEditor> with TickerProviderStateMixin {
 
   Future<void> _initializeVideoController() async {
     if (_videoFile != null) {
-      videoPlayerController.addListener(() {
-        setState(() {
-          _currentPosition =
-              videoPlayerController.value.position.inMilliseconds;
-          if (_currentPosition > widget.trimmer.videoEndPos.toInt()) {
-            _animationController!.reset();
-          } else {
-            if (!_animationController!.isAnimating) {
-              widget.onChangePlaybackState!(true);
-            }
-          }
-        });
-      });
       videoPlayerController.setVolume(1.0);
       _videoDuration = videoPlayerController.value.duration.inMilliseconds;
 
@@ -459,7 +446,6 @@ class _TrimEditorState extends State<TrimEditor> with TickerProviderStateMixin {
   void dispose() {
     _animationController?.removeListener(() {});
     _animationController?.dispose();
-    videoPlayerController.removeListener(() {});
     _scrubberAnimation?.removeListener(() {});
     super.dispose();
   }
